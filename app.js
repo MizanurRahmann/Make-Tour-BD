@@ -85,12 +85,54 @@ const deleteTour = (req, res) => {
     });
 };
 
-// ROUTES
+const gettAllUsers = (req, res) => {
+    res.status(500).json({
+        status: "fail",
+        message: "This route is not yet defined",
+    });
+};
+
+const gettUser = (req, res) => {
+    res.status(500).json({
+        status: "fail",
+        message: "This route is not yet defined",
+    });
+};
+
+const createUser = (req, res) => {
+    res.status(500).json({
+        status: "fail",
+        message: "This route is not yet defined",
+    });
+};
+
+const updateUser = (req, res) => {
+    res.status(500).json({
+        status: "fail",
+        message: "This route is not yet defined",
+    });
+};
+
+const deleteUser = (req, res) => {
+    res.status(500).json({
+        status: "fail",
+        message: "This route is not yet defined",
+    });
+};
+
+// TOUR ROUTES
 app.route("/api/v1/tours").get(getAllTours).post(createTour);
 app.route("/api/v1/tours/:id")
     .get(getTour)
     .patch(updateTour)
     .delete(deleteTour);
+
+// USER ROUTES
+app.route("/api/v1/tours").get(gettAllUsers).post(createUser);
+app.route("/api/v1/tours/:id")
+    .get(gettUser)
+    .patch(updateUser)
+    .delete(deleteUser);
 
 const port = 8000;
 app.listen(port, () => {
