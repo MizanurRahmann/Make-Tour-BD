@@ -1,15 +1,16 @@
 {
-  "name": "make-tour-bd",
-  "version": "1.0.0",
-  "description": "learning express, mongoDB and NODE",
-  "main": "app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Md. Mizanur Rahman",
-  "license": "ISC",
-  "dependencies": {
-    "dotenv": "^8.2.0",
-    "express": "^4.17.1"
-  }
+    "name": "make-tour-bd",
+    "version": "1.0.0",
+    "description": "learning express, mongoDB and NODE",
+    "main": "app.js",
+    "scripts": {
+        "start:dev": "nodemon server.js",
+        "start:prod": "NODE_ENV=production nodemon server.js"
+    },
+    "author": "Md. Mizanur Rahman",
+    "license": "ISC",
+    "dependencies": {
+        "dotenv": "^8.2.0",
+        "express": "^4.17.1"
+    }
 }
