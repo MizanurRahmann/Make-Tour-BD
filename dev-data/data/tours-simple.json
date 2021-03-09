@@ -169,19 +169,5 @@
             "2022-01-16,10:00",
             "2022-12-12,10:00"
         ]
-    },
-    {
-        "id": 9,
-        "name": "Bandarban Tour",
-        "duration": 5,
-        "price": 400,
-        "difficulties": "easy"
-    },
-    {
-        "id": 10,
-        "name": "Bandarban Tour",
-        "duration": 5,
-        "price": 400,
-        "difficulties": "easy"
     }
 ]
