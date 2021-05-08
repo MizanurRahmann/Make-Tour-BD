@@ -80,10 +80,17 @@ tourSchema.post('save', function(doc, next) {
 });
 
 // QUERY MIDDLEWARE:
-tourSchema.pre('find', function(next) {
+// Secrete tours are not show
+tourSchema.pre(/^find/, function(next) {
    this.find({ secretTour: {$ne: true} });
+   this.start = Date.now();
     next();
 });
+tourSchema.post(/^find/, function(docs, next) {
+    console.log(`Query tooks ${Date.now() - this.start} milliseconds.`);
+    console.log(docs);
+     next();
+ });
 
 const Tour = mongoose.model("Tour", tourSchema);
 
