@@ -112,3 +112,35 @@ exports.deleteTour = async (req, res) => {
     });
   }
 };
+
+// GET TOUR STATS
+exports.getTourStats = async (req, res) => {
+  try{
+    const stats = await Tour.aggregate([
+      {
+        $match: {ratingsAverage: {$gte: 4.5}}
+      },
+      {
+        $group: {
+          _id: null,
+          avgRatting: {$avg: '$ratingsAverage'},
+          avgPrice: {$avg: '$price'},
+          minPrice: {$min: '$price'},
+          maxPrice: {$max: '$price'},
+        }
+      }
+    ]);
+    res.status(200).json({
+      status: "success",
+      data: {
+        stats
+      },
+    });
+  } catch (err) {
+    console.log("NOT OK")
+    res.status(400).json({
+      status: "fail",
+      message: "Invalid Data Sent!",
+    });
+  }
+}
