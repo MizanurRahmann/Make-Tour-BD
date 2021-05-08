@@ -17,7 +17,7 @@ exports.getAllTours = async (req, res) => {
       .sort()
       .limitFields()
       .pagination();
-    
+
     const tours = await features.query;
 
     // Send Responce
@@ -115,32 +115,89 @@ exports.deleteTour = async (req, res) => {
 
 // GET TOUR STATS
 exports.getTourStats = async (req, res) => {
-  try{
+  try {
     const stats = await Tour.aggregate([
       {
-        $match: {ratingsAverage: {$gte: 4.5}}
+        $match: { ratingsAverage: { $gte: 4.5 } },
       },
       {
         $group: {
-          _id: null,
-          avgRatting: {$avg: '$ratingsAverage'},
-          avgPrice: {$avg: '$price'},
-          minPrice: {$min: '$price'},
-          maxPrice: {$max: '$price'},
-        }
-      }
+          _id: "$difficulty",
+          num: { $sum: 1 },
+          numRattings: { $sum: "$ratingsQuantity" },
+          avgRatting: { $avg: "$ratingsAverage" },
+          avgPrice: { $avg: "$price" },
+          minPrice: { $min: "$price" },
+          maxPrice: { $max: "$price" },
+        },
+      },
+      {
+        $sort: { avgPrice: 1 },
+      },
+      // {
+      //   $match: { _id: { $ne: 'easy' } }
+      // }
     ]);
     res.status(200).json({
       status: "success",
       data: {
-        stats
+        stats,
       },
     });
   } catch (err) {
-    console.log("NOT OK")
     res.status(400).json({
       status: "fail",
       message: "Invalid Data Sent!",
     });
   }
-}
+};
+
+exports.getMonthlyPlan = async (req, res) => {
+  try {
+    const year = req.params.year * 1;
+    const plan = await Tour.aggregate([
+      {
+        $unwind: "$startDates",
+      },
+      {
+        $match: {
+          startDates: {
+            $gte: new Date(`${year}-01-01`),
+            $lte: new Date(`${year}-12-31`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: "$startDates" },
+          numTourStarts: { $sum: 1 },
+          tours: { $push: "$name" },
+        },
+      },
+      {
+        $addFields: { month: "$_id" },
+      },
+      {
+        $project: { _id: 0 }
+      },
+      {
+        $sort: { numTourStarts: -1 }
+      },
+      // {
+      //   $limit: 6
+      // }
+    ]);
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        plan,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: "Invalid Data Sent!",
+    });
+  }
+};
