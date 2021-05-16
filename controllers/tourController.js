@@ -1,5 +1,6 @@
 const Tour = require("../models/tourModel");
 const ApiFeatures = require("../utils/apiFeatures");
+const catchAsync = require("../utils/catchAsync");
 
 // ALIASING (top 5 cheapest tour)
 exports.aliasTopTours = (req, res, next) => {
@@ -36,24 +37,17 @@ exports.getAllTours = async (req, res) => {
   }
 };
 
-// GET A TOUR
-exports.getTour = async (req, res) => {
-  try {
+// GET A TOUR (error handling in async way for learning perpose)
+exports.getTour = catchAsync(async (req, res) => {
     const tour = await Tour.findById(req.params.id);
-
+    
     res.status(200).json({
       status: "success",
       data: {
         tour,
       },
     });
-  } catch (err) {
-    res.status(404).json({
-      status: "fail",
-      message: err,
-    });
-  }
-};
+});
 
 // CREATE A TOUR
 exports.createTour = async (req, res) => {
