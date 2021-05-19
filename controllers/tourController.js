@@ -54,9 +54,8 @@ exports.getTour = catchAsync(async (req, res, next) => {
     });
 });
 
-// CREATE A TOUR
-exports.createTour = async (req, res) => {
-  try {
+// CREATE A TOUR (error handling in async way for learning perpose)
+exports.createTour = catchAsync(async (req, res, next) => {
     const newTour = await Tour.create(req.body);
 
     res.status(201).json({
@@ -65,13 +64,7 @@ exports.createTour = async (req, res) => {
         tour: newTour,
       },
     });
-  } catch (err) {
-    res.status(400).json({
-      status: "fail",
-      message: err,
-    });
-  }
-};
+});
 
 // UPDATE A TOUR:
 exports.updateTour = async (req, res) => {
