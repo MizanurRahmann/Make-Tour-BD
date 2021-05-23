@@ -13,13 +13,7 @@ const signToken = (id) => {
 
 // Sign up functionality
 exports.signup = catchAsync(async (req, res, next) => {
-  const newUser = await User.create({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    confirmPassword: req.body.confirmPassword,
-    passwordChangedAt: req.body.passwordChangedAt
-  });
+  const newUser = await User.create(req.body);
 
   const token = signToken(newUser._id);
 
@@ -56,7 +50,7 @@ exports.login = catchAsync(async (req, res, next) => {
   });
 });
 
-// Protecting routes functionality
+// PROTECTING ROUTES
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) Getting token and check of its there
   let token;
@@ -89,3 +83,14 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   next();
 });
+
+
+// RESTRITCT ROUTES
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    if(!roles.includes(req.user.role)) {
+      return next(new AppError('You do not have permission to perform this action.', 403))
+    }
+    next();
+  };
+};
