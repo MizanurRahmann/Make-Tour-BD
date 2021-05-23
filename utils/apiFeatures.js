@@ -25,7 +25,6 @@ class ApiFeatures{
             this.query = this.query.sort(sortBy);
         } else {
             this.query = this.query.sort("-createdAt");
-            console.log("OK");
         }
         return this;
     }

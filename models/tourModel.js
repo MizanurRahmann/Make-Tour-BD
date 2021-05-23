@@ -92,10 +92,6 @@ tourSchema.pre('save', function(next) {
     this.slug = slugify(this.name, {lower: true});
     next();
 });
-tourSchema.post('save', function(doc, next) {
-    // console.log(doc);
-    next();
-});
 
 // QUERY MIDDLEWARE:
 // Secrete tours are not show
@@ -106,7 +102,6 @@ tourSchema.pre(/^find/, function(next) {
 });
 tourSchema.post(/^find/, function(docs, next) {
     console.log(`Query tooks ${Date.now() - this.start} milliseconds.`);
-    // console.log(docs);
      next();
  });
 
