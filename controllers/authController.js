@@ -1,4 +1,3 @@
-const { promisify } = require('util');
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
@@ -50,6 +49,26 @@ exports.login = catchAsync(async (req, res, next) => {
   });
 });
 
+// FORGOT PASSWORD FUNCTIONALITY
+exports.forgotPassword = async (req, res, next) => {
+  // 1) Get user based on POSTed email
+  const user = await User.findOne({email: req.body.email});
+  if(!user) {
+    return next(new AppError('There is no user with this email address.', 404));
+  }
+
+  // 2) Generate the random token
+  const resetToken = user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false });
+
+  // 3) Send to user email
+}
+
+// RESET PASSWORD FUNCTIONALITY
+exports.resetPassword = (req, res, next) => {
+
+}
+
 // PROTECTING ROUTES
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) Getting token and check of its there
@@ -62,7 +81,6 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
   
   // 2) Verification token
-  // const decoded = promisify(jwt.verify)(token, process.env.JWT_SECRET); (complex procedure 😤 )
   const decoded = await jwt.verify(token, process.env.JWT_SECRET);
 
   // 3) Check if user still exits
