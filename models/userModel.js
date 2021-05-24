@@ -40,6 +40,11 @@ const userSchema = mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpire: Date,
+  active: {
+    type: Boolean,
+    default: false,
+    select: false
+  }
 });
 
 // ============= MIDDLWARES =============
@@ -59,6 +64,11 @@ userSchema.pre("save", function (next) {
 
   // If password changed, set timestamp to DB
   this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
+userSchema.pre(/^find/, function(next) {
+  this.find({active: { $ne: false }});
   next();
 });
 
