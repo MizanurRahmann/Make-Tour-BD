@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
@@ -87,9 +88,33 @@ exports.forgotPassword = async (req, res, next) => {
 }
 
 // RESET PASSWORD FUNCTIONALITY
-exports.resetPassword = (req, res, next) => {
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  // 1) Get user based on the token
+  const hasedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
+  const user = await User.findOne({ 
+    passwordResetToken: hasedToken,
+    passwordResetExpire: {$gte: Date.now()}
+  });
 
-}
+  // 2) If token has not expired, and there is user, set the password
+  if(!user){
+    return next(new AppError('Token is invalid or has expired.', 400));
+  }
+  user.password = req.body.password;
+  user.confirmPassword = req.body.confirmPassword;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpire = undefined;
+  await user.save();
+
+  // 3) Update changePasswordAt properly for the user
+
+  // 4) Log the user in, send JWT
+  const token = signToken(user._id);
+  res.status(200).json({
+    status: "success",
+    token,
+  });
+});
 
 // PROTECTING ROUTES
 exports.protect = catchAsync(async (req, res, next) => {

@@ -42,6 +42,7 @@ const userSchema = mongoose.Schema({
   passwordResetExpire: Date,
 });
 
+// ============= MIDDLWARES =============
 userSchema.pre("save", async function (next) {
   // Only run this function if password was actually modified
   if (!this.isModified("password")) return next();
@@ -52,6 +53,17 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
+userSchema.pre("save", function (next) {
+  // If password doesn't modified or new then just go to next instruction
+  if (!this.isModified("password") || this.isNew) return next();
+
+  // If password changed, set timestamp to DB
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
+// ============= METHODS =============
+// Check password is correct or not?
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword
@@ -59,6 +71,7 @@ userSchema.methods.correctPassword = async function (
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
+// Check when the password changed?
 userSchema.methods.changePasswordAfter = function (JWTtimestamp) {
   if (this.passwordChangedAt) {
     const changedTimeStamp = parseInt(this.passwordChangedAt.getTime() / 1000);
@@ -67,9 +80,11 @@ userSchema.methods.changePasswordAfter = function (JWTtimestamp) {
   return false;
 };
 
+// Create a password rest token with expire date and save to DB
 userSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString("hex");
   
+  // save encrypted one
   this.passwordResetToken = crypto
     .createHash("sha256")
     .update(resetToken)
@@ -77,6 +92,7 @@ userSchema.methods.createPasswordResetToken = function () {
 
   this.passwordResetExpire = Date.now() + 10 * 60 * 1000;
 
+  // send real one
   return resetToken;
 };
 
