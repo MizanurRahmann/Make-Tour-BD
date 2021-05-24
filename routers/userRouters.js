@@ -19,7 +19,7 @@ userRouters.patch(
   authController.protect,
   userController.updateMe
 );
-userRouters.patch(
+userRouters.delete(
   "/deleteMe",
   authController.protect,
   userController.deleteMe
