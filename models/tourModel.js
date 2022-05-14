@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const slugify = require("slugify");
-const User = require("./userModel");
+// const User = require("./userModel");
 
 const tourSchema = mongoose.Schema(
   {
@@ -107,7 +107,12 @@ const tourSchema = mongoose.Schema(
         day: Number,
       },
     ],
-    guides: Array,
+    guides: [
+        {
+            type: mongoose.Schema.ObjectId,
+            ref: 'User',
+        }
+    ],
   },
   {
     toJSON: { virtuals: true },
@@ -126,11 +131,11 @@ tourSchema.pre("save", function (next) {
   next();
 });
 
-tourSchema.pre("save", async function(next) {
-    const guidePromises = this.guides.map(async id => await User.findById(id));
-    this.guides = await Promise.all(guidePromises);
-    next();
-})
+// tourSchema.pre("save", async function(next) {
+//     const guidePromises = this.guides.map(async id => await User.findById(id));
+//     this.guides = await Promise.all(guidePromises);
+//     next();
+// })
 
 // QUERY MIDDLEWARE:
 // Secrete tours are not show
@@ -139,6 +144,7 @@ tourSchema.pre(/^find/, function (next) {
   this.start = Date.now();
   next();
 });
+
 tourSchema.post(/^find/, function (docs, next) {
   console.log(`Query tooks ${Date.now() - this.start} milliseconds.`);
   next();
